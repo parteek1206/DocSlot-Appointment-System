@@ -1,0 +1,188 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*, com.appointment.util.DBConnection" %>
+<%
+    // Session validation
+    if (session == null || !"USER".equalsIgnoreCase((String) session.getAttribute("role"))) {
+        response.sendRedirect("index.jsp?error=unauthorized");
+        return;
+    }
+    int clientId = (int) session.getAttribute("userId");
+    String userName = (String) session.getAttribute("userName");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard - Book Appointment</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="navbar">
+        <h2>Online Appointment System</h2>
+        <div>
+            <span>Welcome, <strong><%= userName %></strong> (Client)</span>
+            <a href="auth?action=logout" class="btn-logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <%
+            String msg = request.getParameter("msg");
+            String error = request.getParameter("error");
+            if (msg != null) {
+        %>
+            <div class="alert alert-success"><%= msg %></div>
+        <%
+            }
+            if (error != null) {
+        %>
+            <div class="alert alert-danger"><%= error %></div>
+        <%
+            }
+        %>
+
+        <!-- 1. Search & Filter Section -->
+        <div class="card">
+            <h3>Find & Book Consultation Slots</h3>
+            <form action="slots" method="get" class="filter-form">
+                <label>Select Provider:</label>
+                <select name="providerId" required>
+                    <option value="">-- Choose Consultant --</option>
+                    <%
+                        try (Connection conn = DBConnection.getConnection()) {
+                            PreparedStatement ps = conn.prepareStatement("SELECT user_id, full_name FROM users WHERE role = 'PROVIDER'");
+                            ResultSet rs = ps.executeQuery();
+                            while (rs.next()) {
+                    %>
+                        <option value="<%= rs.getInt("user_id") %>"><%= rs.getString("full_name") %></option>
+                    <%
+                            }
+                        } catch (Exception e) { e.printStackTrace(); }
+                    %>
+                </select>
+
+                <label>Select Date:</label>
+                <input type="date" name="date" required>
+
+                <button type="submit" class="btn btn-primary">Check Availability</button>
+            </form>
+        </div>
+
+        <!-- 2. Available Slots Grid -->
+        <%
+            String selectedProvider = (String) request.getAttribute("selectedProviderId");
+            String selectedDate = (String) request.getAttribute("selectedDate");
+
+            if (selectedProvider != null && selectedDate != null) {
+        %>
+            <div class="card">
+                <h3>Available Time Windows (<%= selectedDate %>)</h3>
+                <div class="slots-grid">
+                    <%
+                        try (Connection conn = DBConnection.getConnection()) {
+                            String sql = "SELECT slot_id, start_time, end_time, status FROM slots WHERE provider_id = ? AND slot_date = ?";
+                            PreparedStatement ps = conn.prepareStatement(sql);
+                            ps.setInt(1, Integer.parseInt(selectedProvider));
+                            ps.setDate(2, Date.valueOf(selectedDate));
+                            ResultSet rs = ps.executeQuery();
+
+                            boolean hasSlots = false;
+                            while (rs.next()) {
+                                hasSlots = true;
+                                int slotId = rs.getInt("slot_id");
+                                String start = rs.getString("start_time");
+                                String end = rs.getString("end_time");
+                                String status = rs.getString("status");
+                    %>
+                        <div class="slot-box <%= status.toLowerCase() %>">
+                            <p><strong><%= start.substring(0, 5) %> - <%= end.substring(0, 5) %></strong></p>
+                            <% if ("AVAILABLE".equalsIgnoreCase(status)) { %>
+                                <form action="book" method="post">
+                                    <input type="hidden" name="slotId" value="<%= slotId %>">
+                                    <button type="submit" class="btn btn-sm btn-primary">Book Slot</button>
+                                </form>
+                            <% } else { %>
+                                <span class="badge badge-booked">Reserved</span>
+                            <% } %>
+                        </div>
+                    <%
+                            }
+                            if (!hasSlots) {
+                    %>
+                        <p>No slots generated by the provider for this date.</p>
+                    <%
+                            }
+                        } catch (Exception e) { e.printStackTrace(); }
+                    %>
+                </div>
+            </div>
+        <%
+            }
+        %>
+
+        <!-- 3. Active Bookings Ledger -->
+        <div class="card">
+            <h3>My Scheduled Appointments</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Appt ID</th>
+                        <th>Provider Name</th>
+                        <th>Consultation Date</th>
+                        <th>Time Interval</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        try (Connection conn = DBConnection.getConnection()) {
+                            String sql = "SELECT a.appointment_id, a.booking_status, s.slot_id, s.slot_date, s.start_time, s.end_time, u.full_name " +
+                                         "FROM appointments a " +
+                                         "JOIN slots s ON a.slot_id = s.slot_id " +
+                                         "JOIN users u ON s.provider_id = u.user_id " +
+                                         "WHERE a.client_id = ? ORDER BY s.slot_date DESC";
+                            PreparedStatement ps = conn.prepareStatement(sql);
+                            ps.setInt(1, clientId);
+                            ResultSet rs = ps.executeQuery();
+
+                            boolean hasAppt = false;
+                            while (rs.next()) {
+                                hasAppt = true;
+                                int apptId = rs.getInt("appointment_id");
+                                int slotId = rs.getInt("slot_id");
+                                String status = rs.getString("booking_status");
+                    %>
+                        <tr>
+                            <td>APT-<%= apptId %></td>
+                            <td><%= rs.getString("full_name") %></td>
+                            <td><%= rs.getDate("slot_date") %></td>
+                            <td><%= rs.getString("start_time").substring(0, 5) %> - <%= rs.getString("end_time").substring(0, 5) %></td>
+                            <td><span class="badge <%= status.toLowerCase() %>"><%= status %></span></td>
+                            <td>
+                                <% if ("CONFIRMED".equalsIgnoreCase(status)) { %>
+                                    <a href="book?action=cancel&apptId=<%= apptId %>&slotId=<%= slotId %>" 
+                                       class="btn btn-sm btn-danger" 
+                                       onclick="return confirm('Cancel this appointment?');">Cancel</a>
+                                <% } else { %>
+                                    <span class="text-muted">Closed</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <%
+                            }
+                            if (!hasAppt) {
+                    %>
+                        <tr>
+                            <td colspan="6" style="text-align:center;">No past or upcoming appointments found.</td>
+                        </tr>
+                    <%
+                            }
+                        } catch (Exception e) { e.printStackTrace(); }
+                    %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

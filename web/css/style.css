@@ -1,0 +1,287 @@
+/* Base Reset & Fonts */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #f7f9fa;
+    color: #1a1a1a;
+    line-height: 1.5;
+}
+
+/* Header & Top Navigation */
+.header {
+    background-color: #111827;
+    color: #ffffff;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.header h2 {
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.header p {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin-top: 0.3rem;
+}
+
+.navbar {
+    background-color: #111827;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 2rem;
+}
+
+.navbar h2 {
+    font-size: 1.2rem;
+}
+
+.btn-logout {
+    background: #ef4444;
+    color: #ffffff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-left: 1rem;
+}
+
+/* Container & Cards */
+.container {
+    max-width: 1050px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card h3 {
+    margin-bottom: 1rem;
+    font-size: 1.15rem;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+}
+
+/* Layout Grids */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1.2rem;
+}
+
+.stat-card h4 {
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #111827;
+    margin-top: 0.4rem;
+}
+
+/* Forms & Inputs */
+form label {
+    display: block;
+    margin-top: 0.8rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="date"],
+form input[type="time"],
+form select {
+    width: 100%;
+    padding: 0.55rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.filter-form {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.filter-form > div,
+.filter-form > label {
+    flex: 1;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.55rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: 1rem;
+}
+
+.btn-primary {
+    background-color: #111827;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #1f2937;
+}
+
+.btn-secondary {
+    background-color: #4b5563;
+    color: #ffffff;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
+.btn-sm {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    margin-top: 0;
+}
+
+/* Slots Grid */
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.slot-box {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0.8rem;
+    text-align: center;
+    background: #f9fafb;
+}
+
+.slot-box.available {
+    border-color: #10b981;
+    background: #ecfdf5;
+}
+
+.slot-box.booked {
+    border-color: #e5e7eb;
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+
+/* Tables */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.8rem;
+    font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+    padding: 0.65rem 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table th {
+    background-color: #f9fafb;
+    color: #4b5563;
+    font-weight: 600;
+}
+
+/* Badges & Alerts */
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge.confirmed,
+.badge.user {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge.provider {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.badge.admin {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-booked {
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.alert-success {
+    background-color: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+}
+
+.alert-danger {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.text-muted {
+    color: #9ca3af;
+    font-size: 0.85rem;
+}
