@@ -63,8 +63,8 @@
 
                     <label>Select Role</label>
                     <select name="role" required>
-                        <option value="USER">Client / Patient</option>
-                        <option value="PROVIDER">Doctor / Consultant</option>
+                        <option value="USER">Service Seeker</option>
+                        <option value="PROVIDER">Service Provider</option>
                     </select>
 
                     <button type="submit" class="btn btn-secondary">Register</button>
